@@ -1,0 +1,26 @@
+name: anomaly_detection
+description: "Network metric anomaly - Isolation Forest detection test"
+duration_s: 60
+num_evs: 5
+network_conditions:
+  urllc: {latency_ms: 2,  loss_rate: 0.0001, utilization: 0.4}
+  embb:  {latency_ms: 18, loss_rate: 0.001,  utilization: 0.5}
+  mmtc:  {latency_ms: 85, loss_rate: 0.005,  utilization: 0.3}
+events:
+  - at_seconds: 15
+    type: inject_network_anomaly
+    target_slice: urllc
+    anomaly_type: latency_spike
+    latency_ms: 45
+    duration_seconds: 8
+  - at_seconds: 35
+    type: inject_network_anomaly
+    target_slice: all
+    anomaly_type: packet_storm
+    loss_rate_multiplier: 20
+    duration_seconds: 5
+expected_outcomes:
+  - "Isolation Forest flags anomaly within 2 seconds"
+  - "vesper_anomaly_detections_total increments"
+  - "Priority escalation visible in decision log"
+  - "Controller adapts routing after anomaly flag"

@@ -1,0 +1,24 @@
+name: battery_overheat_network_degradation
+description: "Battery overheating + network degradation - compound stress test"
+duration_s: 90
+num_evs: 5
+network_conditions:
+  urllc: {latency_ms: 2,   loss_rate: 0.0002, utilization: 0.5}
+  embb:  {latency_ms: 25,  loss_rate: 0.003,  utilization: 0.65}
+  mmtc:  {latency_ms: 120, loss_rate: 0.008,  utilization: 0.4}
+events:
+  - at_seconds: 10
+    ev_id: "EV-002"
+    type: battery_temperature_ramp
+    start_temp_celsius: 55
+    end_temp_celsius: 72
+    ramp_seconds: 30
+  - at_seconds: 25
+    type: network_degradation
+    target_slice: embb
+    latency_multiplier: 3
+    loss_rate_multiplier: 5
+expected_outcomes:
+  - "EV-002 battery event escalated to URLLC at temp>65°C"
+  - "Risk score visible increase"
+  - "Rule R03 triggered in decision log"

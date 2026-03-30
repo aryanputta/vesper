@@ -1,0 +1,19 @@
+name: normal_operations
+description: "Normal driving with healthy network - baseline scenario"
+duration_s: 60
+num_evs: 5
+network_conditions:
+  urllc: {latency_ms: 1.5, loss_rate: 0.0001, utilization: 0.3}
+  embb:  {latency_ms: 15,  loss_rate: 0.001,  utilization: 0.4}
+  mmtc:  {latency_ms: 80,  loss_rate: 0.005,  utilization: 0.2}
+ev_profiles:
+  base_speed_kmh: 65
+  speed_variance: 10
+  obstacle_probability: 0.02
+  battery_start_temp: 42
+events: []
+expected_outcomes:
+  - "Most traffic on EMBB/MMTC slices"
+  - "URLLC utilization < 0.4"
+  - "Zero CRITICAL escalations"
+  - "All EV states: NORMAL"

@@ -1,0 +1,21 @@
+name: urllc_saturation
+description: "URLLC becomes congested - graceful degradation test"
+duration_s: 60
+num_evs: 8
+network_conditions:
+  urllc: {latency_ms: 3,  loss_rate: 0.001, utilization: 0.92}
+  embb:  {latency_ms: 18, loss_rate: 0.002, utilization: 0.55}
+  mmtc:  {latency_ms: 90, loss_rate: 0.005, utilization: 0.3}
+events:
+  - at_seconds: 5
+    type: urllc_saturation_increase
+    target_utilization: 0.97
+    ramp_seconds: 10
+  - at_seconds: 15
+    ev_id: "EV-003"
+    type: obstacle_approach
+expected_outcomes:
+  - "LOW traffic shed to MMTC"
+  - "MEDIUM traffic moved to EMBB"
+  - "CRITICAL safety events preserved on URLLC"
+  - "Zero safety event drops"

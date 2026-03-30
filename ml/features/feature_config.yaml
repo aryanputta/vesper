@@ -1,0 +1,243 @@
+# VESPER – Feature Configuration
+# Defines all 32 engineered features used by the slice classifier,
+# window sizes, target classes, and urgency score weights.
+
+features:
+  # --- Vehicle telemetry rolling features (12 features) ---
+  - name: speed_mean_5s
+    window_s: 5
+    stat: mean
+    source: telemetry
+    description: "Mean vehicle speed over 5s"
+
+  - name: speed_std_5s
+    window_s: 5
+    stat: std
+    source: telemetry
+    description: "Std-dev of vehicle speed over 5s (volatility indicator)"
+
+  - name: accel_mean_5s
+    window_s: 5
+    stat: mean
+    source: telemetry
+    description: "Mean longitudinal acceleration over 5s"
+
+  - name: accel_max_5s
+    window_s: 5
+    stat: max
+    source: telemetry
+    description: "Peak acceleration magnitude over 5s"
+
+  - name: brake_mean_5s
+    window_s: 5
+    stat: mean
+    source: telemetry
+    description: "Mean brake intensity over 5s"
+
+  - name: brake_max_5s
+    window_s: 5
+    stat: max
+    source: telemetry
+    description: "Peak brake intensity over 5s"
+
+  - name: battery_temp_mean_5s
+    window_s: 5
+    stat: mean
+    source: telemetry
+    description: "Mean battery temperature over 5s"
+
+  - name: battery_temp_slope_5s
+    window_s: 5
+    stat: slope
+    source: telemetry
+    description: "Linear trend slope of battery temperature over 5s (°C/sample)"
+
+  - name: obstacle_dist_min_5s
+    window_s: 5
+    stat: min
+    source: telemetry
+    description: "Minimum obstacle distance observed over 5s"
+
+  - name: obstacle_dist_slope_5s
+    window_s: 5
+    stat: slope
+    source: telemetry
+    description: "Trend slope of obstacle distance over 5s (negative = approaching)"
+
+  - name: sensor_conf_mean_5s
+    window_s: 5
+    stat: mean
+    source: telemetry
+    description: "Mean sensor suite confidence over 5s"
+
+  - name: congestion_event_count_10s
+    window_s: 10
+    stat: count
+    source: derived
+    description: "Count of samples where any slice utilisation > 0.8 in last 10s"
+
+  # --- Network slice metric features (9 features) ---
+  - name: urllc_latency_mean_5s
+    window_s: 5
+    stat: mean
+    source: network
+    description: "Mean URLLC one-way latency over 5s (ms)"
+
+  - name: urllc_latency_slope_5s
+    window_s: 5
+    stat: slope
+    source: network
+    description: "Trend slope of URLLC latency over 5s"
+
+  - name: urllc_utilization
+    window_s: 0
+    stat: instant
+    source: network
+    description: "Instantaneous URLLC slice utilisation ratio [0,1]"
+
+  - name: urllc_loss_rate
+    window_s: 0
+    stat: instant
+    source: network
+    description: "Instantaneous URLLC packet loss rate [0,1]"
+
+  - name: embb_latency_mean_5s
+    window_s: 5
+    stat: mean
+    source: network
+    description: "Mean eMBB one-way latency over 5s (ms)"
+
+  - name: embb_utilization
+    window_s: 0
+    stat: instant
+    source: network
+    description: "Instantaneous eMBB slice utilisation ratio [0,1]"
+
+  - name: mmtc_utilization
+    window_s: 0
+    stat: instant
+    source: network
+    description: "Instantaneous mMTC slice utilisation ratio [0,1]"
+
+  # --- Composite / derived features (1 feature) ---
+  - name: urgency_score
+    window_s: 0
+    stat: instant
+    source: derived
+    description: "Composite urgency score [0,1] from UrgencyScorer"
+
+  - name: retransmission_proxy
+    window_s: 0
+    stat: instant
+    source: derived
+    description: "Proxy for retransmissions: urllc_loss_rate * urllc_throughput_mbps"
+
+  # --- Satellite NTN features (4 features) ---
+  - name: satellite_link_active
+    window_s: 0
+    stat: instant
+    source: satellite
+    description: "Boolean flag: 1 if the EV has an active NTN satellite link, 0 otherwise"
+
+  - name: satellite_elevation_deg
+    window_s: 0
+    stat: instant
+    source: satellite
+    description: "Current satellite elevation angle above horizon in degrees (0 = at horizon, 90 = zenith)"
+
+  - name: satellite_latency_ms
+    window_s: 0
+    stat: instant
+    source: satellite
+    description: "Current NTN satellite round-trip latency in ms (varies 240–1400 ms by elevation)"
+
+  - name: satellite_link_quality
+    window_s: 0
+    stat: instant
+    source: satellite
+    description: "Normalised satellite link quality [0,1] derived from Ka-band link budget"
+
+  # --- 6G network features (6 features) ---
+  - name: sixg_available
+    window_s: 0
+    stat: instant
+    source: sixg
+    description: "Boolean flag: 1 if a 6G node is within 200 m range of the EV, 0 otherwise"
+
+  - name: sixg_beamforming_gain_db
+    window_s: 0
+    stat: instant
+    source: sixg
+    description: "AI-assisted massive MIMO beamforming gain in dB from the nearest 6G node"
+
+  - name: sixg_throughput_gbps
+    window_s: 0
+    stat: instant
+    source: sixg
+    description: "Effective 6G downlink throughput in Gbps at current distance and speed"
+
+  - name: digital_twin_sync_latency_ms
+    window_s: 0
+    stat: instant
+    source: sixg
+    description: "Age of the digital twin state for this EV at the serving 6G node in ms"
+
+  - name: semantic_compression_ratio
+    window_s: 0
+    stat: instant
+    source: sixg
+    description: "Semantic compression ratio [0,1]: fraction of original payload after 6G semantic encoding"
+
+  - name: isac_obstacle_confidence
+    window_s: 0
+    stat: instant
+    source: sixg
+    description: "ISAC radar sensing confidence [0,1] for nearest detected obstacle"
+
+  - name: ntn_sat_utilization
+    window_s: 0
+    stat: instant
+    source: network
+    description: "Instantaneous NTN satellite slice utilisation ratio [0,1] — high value biases away from NTN_SAT"
+
+# Rolling window sizes in samples (at 10 Hz: 20=2s, 50=5s, 100=10s)
+windows: [20, 50, 100]
+
+# Human-readable window labels matching windows list
+window_labels:
+  20: "2s"
+  50: "5s"
+  100: "10s"
+
+# Alias in seconds for convenience
+windows_seconds: [2, 5, 10]
+
+# Target class definitions (integer-encoded)
+target_classes:
+  0: MMTC       # Massive Machine-Type Communications – low urgency bulk telemetry
+  1: EMBB       # Enhanced Mobile Broadband – moderate priority, high throughput
+  2: URLLC      # Ultra-Reliable Low-Latency – safety-critical, emergency
+  3: NTN_SAT    # Non-Terrestrial Network satellite – backup/offload path
+  4: 6G_URLLC   # 6G ultra-reliable, sub-0.1 ms, V2X and ISAC traffic
+  5: 6G_eMBB+   # 6G enhanced broadband, Tbps class, holographic/XR streams
+
+# Urgency score component weights (must sum to 1.0)
+urgency_weights:
+  W_SAFETY_FLAG: 0.30   # Hard emergency flag from vehicle safety controller
+  W_OBSTACLE:    0.25   # Proximity to nearest detected obstacle
+  W_BRAKE:       0.20   # Brake pedal intensity
+  W_BATTERY:     0.15   # Battery thermal condition
+  W_SENSOR:      0.10   # Sensor suite confidence (inverted)
+
+# Thresholds for feature interpretation
+thresholds:
+  urllc_latency_critical_ms: 10.0    # Above this triggers URLLC escalation
+  urllc_latency_warning_ms:  5.0
+  obstacle_critical_m:        8.0
+  obstacle_caution_m:        20.0
+  battery_temp_critical_c:   65.0
+  battery_temp_warning_c:    55.0
+  sensor_conf_critical:       0.30
+  slice_utilisation_high:     0.80   # Congestion event threshold
+  urgency_urllc_threshold:    0.50   # Urgency score → URLLC assignment
+  urgency_embb_threshold:     0.20   # Urgency score → EMBB vs MMTC

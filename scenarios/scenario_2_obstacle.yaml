@@ -1,0 +1,22 @@
+name: obstacle_emergency
+description: "Sudden obstacle while eMBB is heavy - URLLC escalation test"
+duration_s: 45
+num_evs: 5
+network_conditions:
+  urllc: {latency_ms: 1.5, loss_rate: 0.0001, utilization: 0.35}
+  embb:  {latency_ms: 20,  loss_rate: 0.002,  utilization: 0.85}
+  mmtc:  {latency_ms: 100, loss_rate: 0.005,  utilization: 0.6}
+events:
+  - at_seconds: 10
+    ev_id: "EV-001"
+    type: obstacle_approach
+    obstacle_distance_start_m: 50
+    obstacle_close_rate_m_per_s: 4
+  - at_seconds: 10
+    type: embb_load_increase
+    embb_utilization_target: 0.88
+expected_outcomes:
+  - "EV-001 escalated to URLLC within 500ms of obstacle at <20m"
+  - "eMBB traffic deprioritized"
+  - "Safety event response < 5ms"
+  - "EV-001 state: CRITICAL"
